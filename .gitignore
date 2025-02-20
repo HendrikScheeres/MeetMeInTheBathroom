@@ -1,8 +1,14 @@
-/__pycache__
-/data
+## all pychache files
+__pycache__/
+models/__pycache__/
+*.pyc
+/data/scans
+/data/sheets
+
 /.venv
 /.vscode
 /node_modules
 .env
 
 *_test.py
+
