@@ -1,0 +1,9 @@
+/__pycache__
+/models
+/data
+/.venv
+/.vscode
+/node_modules
+.env
+
+*_test.py
