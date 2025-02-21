@@ -4,6 +4,7 @@ models/__pycache__/
 *.pyc
 /data/scans
 /data/sheets
+/data/obsidian
 
 /.venv
 /.vscode
@@ -11,4 +12,3 @@ models/__pycache__/
 .env
 
 *_test.py
-
