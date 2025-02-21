@@ -5,7 +5,6 @@ from mongoengine import connect, disconnect
 def disconnect_db():
     disconnect()
 
-
 def connect_to_client_db():
     username = os.getenv("MONGO_USER")
     password = os.getenv("MONGO_PASSWORD")
