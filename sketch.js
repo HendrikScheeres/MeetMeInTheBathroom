@@ -1,14 +1,63 @@
 const cells = [];
 const connections = [];
-
+bands = {
+  "The Strokes": {
+    "band": {
+      "members": ["Julian Casablancas", "Albert Hammond Jr."]
+    }
+  }
+}
+musicians = {
+  "Julian Casablancas": {
+    "musician": {
+      "bands": ["The Strokes"]
+    }
+  },
+  "Albert Hammond Jr.": {
+    "musician": {
+      "bands": ["The Strokes"]
+    }
+  }
+}
 
 function setup() {
-  createCanvas(600, 600);
-  cells.push(new Cell('0'));
-  cells.push(new Cell('1'));
-  
-  connections.push(new Connection(cells[0], cells[1]));
+  createCanvas(800, 800);
+
+  const cellMap = {}; // Maps names to Cell instances
+
+  // Load bands
+  for (const [bandName, bandData] of Object.entries(bands)) {
+    let bandCell = new Cell(bandName, 'band');
+    cells.push(bandCell);
+    cellMap[bandName] = bandCell;
+
+    for (const member of bandData.band.members) {
+      if (!cellMap[member]) {
+        let musicianCell = new Cell(member, 'musician');
+        cells.push(musicianCell);
+        cellMap[member] = musicianCell;
+      }
+      connections.push(new Connection(bandCell, cellMap[member]));
+    }
+  }
+
+  // Load musicians (ensuring no duplicates)
+  for (const [musicianName, musicianData] of Object.entries(musicians)) {
+    if (!cellMap[musicianName]) {
+      let musicianCell = new Cell(musicianName, 'musician');
+      cells.push(musicianCell);
+      cellMap[musicianName] = musicianCell;
+    }
+    
+    // Connect musicians to bands
+    for (const band of musicianData.musician.bands) {
+      if (cellMap[band]) {
+        connections.push(new Connection(cellMap[band], cellMap[musicianName]));
+      }
+    }
+  }
 }
+
 
 function draw() {
   background(100);
@@ -38,7 +87,7 @@ function mousePressed() {
   for (let i = 0; i < connections.length; i++) {
     conn = connections[i];
     if (conn.flags.hover) {
-      connections.splice(i, 1);
+      conn.flags.dragging = true;
       return;
     }
   }
