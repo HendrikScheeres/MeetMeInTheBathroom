@@ -1,3 +1,4 @@
+
 const TEXTSIZE = 20;
 const RADIUS = 70;
 const MUSICIANCIRCLECOLOR = 250;
@@ -7,11 +8,10 @@ const CIRCLESTROKECOLOR = (0, 0, 0);
 const CIRCLESTROKE = 5;
 const LINEHOVERCOLOR = (255, 0, 0);
 
-
 class Cell {
     constructor(label, type, x=-1, y=-1) {
       this.x = x == -1 ? random(width) : x;
-      this.y = y == -1 ? random(height) : x;
+      this.y = y == -1 ? random(height) : y;
       this.label = label;
       
       this.flags = {
@@ -27,15 +27,6 @@ class Cell {
       this.render_circle();
       this.render_text();
     }
-    
-    // render_text() {
-    //   //OLD
-    //   noStroke();
-    //   fill(0);
-      
-    //   textSize(TEXTSIZE);
-    //   text(this.label, this.x - (textWidth(this.label) / 2), this.y + ((textAscent() + textDescent()) / 4));
-    // }
 
     render_text() {
       noStroke();
@@ -72,5 +63,4 @@ class Cell {
       const d = dist(this.x, this.y, x, y);
       return d <= this.radius;
     }
-    
-  }
+}
