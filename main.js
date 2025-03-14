@@ -1,102 +1,78 @@
+//
+//const width = window.innerWidth;
+//const height = window.innerHeight;
+const width = 3000;
+const height = window.innerHeight;
+
+
 // Arrays to store cells (bands and musicians) and connections between them
 const cells = [];
 const connections = [];
 
-// Data structure for bands and their members
-const bands = {
-  "The Strokes": {
-    "band": {
-      "members": ["Julian Casablancas", "Albert Hammond Jr.", "Fabrizio Moretti", "Nick Valensi"]
-    }
-  }
-};
+// Chat for the server side of things
+//https://chat.deepseek.com/a/chat/s/5c8a5780-320e-40bb-a655-e426b033db11
 
-// Data structure for musicians and the bands they belong to
-const musicians = {
-  "Julian Casablancas": {
-    "musician": {
-      "bands": ["The Strokes"]
-    }
-  },
-  "Albert Hammond Jr.": {
-    "musician": {
-      "bands": ["The Strokes"]
-    }
-  },
-  "Fabrizio Moretti": {
-    "musician": {
-      "bands": ["The Strokes"]
-    }
-  },
-  "Nick Valensi": {
-    "musician": {
-      "bands": ["The Strokes"]
-    }
+let bands = {};
+let musicians = {};
+
+function preload() {
+  // Fetch data from the backend server #5000
+  loadJSON('http://localhost:5000/api/data', (data) => {
+    // Organize the data into the required structure
+    data.bands.forEach(band => {
+      bands[band.name] = {
+        band: {
+          members: band.members,
+        },
+      };
+    });
+
+    data.musicians.forEach(musician => {
+      musicians[musician.name] = {
+        musician: {
+          bands: musician.bands,
+        },
+      };
+    });
+
+    // Call setup after data is loaded
+    initializeCells();
+  });
+}
+
+// Initialize cells and connections
+function initializeCells() {
+  const cellMap = {}; // Maps names to Cell instances for easy lookup
+
+  let bandNames = Object.keys(bands);
+  let numBands = bandNames.length;
+
+  let cols = Math.ceil(Math.sqrt(numBands)); // Number of columns in the grid layout using square root
+  let rows = Math.ceil(numBands / cols); // Number of rows in the grid layout
+  let cellWidth = width / cols; // Width of each cell
+  let cellHeight = height / rows; // Height of each cell
+
+  for (let i = 0; i < numBands; i++) {
+    let bandName = bandNames[i];
+    let col = i % cols; // Column index of the cell
+    let row = Math.floor(i / cols); // Row index of the cell
+    let x = (col + 0.5) * cellWidth; // X-coordinate of the cell
+    let y = (row + 0.5) * cellHeight; // Y-coordinate of the cell
+
+    let bandCell = new Cell(bandName, 'band', x, y);
+    cells.push(bandCell);
+    cellMap[bandName] = bandCell;
   }
-};
+}
 
 // Setup function: Initializes the canvas and creates cells and connections
 function setup() {
-  createCanvas(800, 800);
-
-  const cellMap = {}; // Maps names to Cell instances for easy lookup
-
-  // Load bands and create cells for them
-  for (const [bandName, bandData] of Object.entries(bands)) {
-    // Create a cell for the band and position it in the center of the canvas
-    let bandCell = new Cell(bandName, 'band', width / 2, height / 2);
-    cells.push(bandCell);
-    cellMap[bandName] = bandCell;
-
-    // Calculate angles for positioning musician nodes around the band
-    const angleIncrement = TWO_PI / bandData.band.members.length;
-    let angle = 0;
-
-    // Create cells for each member of the band
-    for (const member of bandData.band.members) {
-      if (!cellMap[member]) {
-        // Position musicians in a circle around the band
-        const x = width / 2 + cos(angle) * 150; // 150 is the radius from the center
-        const y = height / 2 + sin(angle) * 150;
-        let musicianCell = new Cell(member, 'musician', x, y);
-        cells.push(musicianCell);
-        cellMap[member] = musicianCell;
-        angle += angleIncrement;
-      }
-      // Create a connection between the band and the musician
-      connections.push(new Connection(bandCell, cellMap[member]));
-    }
-  }
-
-  // Load musicians and ensure no duplicates
-  for (const [musicianName, musicianData] of Object.entries(musicians)) {
-    if (!cellMap[musicianName]) {
-      // Create a cell for the musician if it doesn't already exist
-      let musicianCell = new Cell(musicianName, 'musician');
-      cells.push(musicianCell);
-      cellMap[musicianName] = musicianCell;
-    }
-
-    // Connect musicians to their bands
-    for (const band of musicianData.musician.bands) {
-      if (cellMap[band]) {
-        connections.push(new Connection(cellMap[band], cellMap[musicianName]));
-      }
-    }
-  }
+  createCanvas(width, height);
 }
 
 // Draw function: Renders the cells and connections on the canvas
 function draw() {
   background(100);
-
-  // Render connections and check for hover state
-  connections.forEach(conn => {
-    if (conn.isInside(mouseX, mouseY)) conn.flags.hover = true;
-    else conn.flags.hover = false;
-
-    conn.render();
-  });
 
   // Render cells and check for hover state
   cells.forEach(cell => {
