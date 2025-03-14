@@ -50,7 +50,7 @@ function initializeCells() {
   let cols = Math.ceil(Math.sqrt(numBands)); // Number of columns in the grid layout using square root
   let rows = Math.ceil(numBands / cols); // Number of rows in the grid layout
   let cellWidth = width / cols; // Width of each cell
-  let cellHeight = height / rows; // Height of each cell
+  let cellHeight = height / (rows * 0.5); // Height of each cell
 
   for (let i = 0; i < numBands; i++) {
     let bandName = bandNames[i];
@@ -62,6 +62,19 @@ function initializeCells() {
     let bandCell = new Cell(bandName, 'band', x, y);
     cells.push(bandCell);
     cellMap[bandName] = bandCell;
+
+    // Create connections between band and musician cells
+    // put the musician name in the cell 
+    bands[bandName].band.members.forEach(musician => {
+      let musicianCell = cellMap[musician];
+      if (!musicianCell) {
+        musicianCell = new Cell(musician, 'musician');
+        cells.push(musicianCell);
+        cellMap[musician] = musicianCell;
+      }
+
+      connections.push(new Connection(bandCell, musicianCell));
+    });
   }
 }
 
@@ -81,6 +94,8 @@ function draw() {
 
     cell.render();
   });
+
+
 }
 
 // Variables for dragging functionality

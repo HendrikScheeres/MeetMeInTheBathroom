@@ -3,6 +3,7 @@ from mdutils import MdUtils
 
 class Band(Document):
     name = StringField(required=True, unique=True)
+    members = ListField(ReferenceField('Person'), required=False)
     meta = { "collection": "bands"}
 
     def create_md(self, directory):
