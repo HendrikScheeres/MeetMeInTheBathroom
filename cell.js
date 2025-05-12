@@ -61,4 +61,13 @@ class Cell {
       const d = dist(this.x, this.y, x, y);
       return d <= this.radius;
     }
+
+    overlapsWith(otherCell) {
+      // Small buffer to avoid jitter when edges just touch
+      const buffer = 5; 
+    
+      const distance = dist(this.x, this.y, otherCell.x, otherCell.y);
+      return distance < (this.radius + otherCell.radius + buffer);
+    }
+    
 }
