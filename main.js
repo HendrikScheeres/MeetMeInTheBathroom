@@ -1,8 +1,12 @@
-//
-//const width = window.innerWidth;
+
 //const height = window.innerHeight;
-const width = 3000;
-const height = window.innerHeight;
+const width = window.innerWidth; // Set width to 80% of the window width
+const height = window.innerHeight; // Set height to 80% of the window height
+const frameWidth = width ; // the width and height of the frame the cells get drawn in
+const frameHeight = height * 0.7; // the width and height of the frame the cells get drawn in
+
+const layoutType = "grid"; // Set the layout to either "grid" or "random"
+const cellMap = {};
 
 
 // Arrays to store cells (bands and musicians) and connections between them
@@ -40,17 +44,15 @@ function preload() {
   });
 }
 
-// Initialize cells and connections
-function initializeCells() {
-  const cellMap = {}; // Maps names to Cell instances for easy lookup
-
-  let bandNames = Object.keys(bands);
+function gridLayout(bandNames) {
+  print("Grid layout");
+  
   let numBands = bandNames.length;
 
   let cols = Math.ceil(Math.sqrt(numBands)); // Number of columns in the grid layout using square root
   let rows = Math.ceil(numBands / cols); // Number of rows in the grid layout
-  let cellWidth = width / cols; // Width of each cell
-  let cellHeight = height / (rows * 0.5); // Height of each cell
+  let cellWidth = frameWidth / cols; // Width of each cell
+  let cellHeight = frameHeight / (rows * 0.5); // Height of each cell
 
   for (let i = 0; i < numBands; i++) {
     let bandName = bandNames[i];
@@ -65,16 +67,52 @@ function initializeCells() {
 
     // Create connections between band and musician cells
     // put the musician name in the cell 
-    bands[bandName].band.members.forEach(musician => {
-      let musicianCell = cellMap[musician];
-      if (!musicianCell) {
-        musicianCell = new Cell(musician, 'musician');
-        cells.push(musicianCell);
-        cellMap[musician] = musicianCell;
-      }
+    // bands[bandName].band.members.forEach(musician => {
+    //   // log what a musician is
+    //   console.log(musician);
+    //   let musicianCell = cellMap[musician];
+    //   if (!musicianCell) {
+    //     musicianCell = new Cell(musician, 'musician');
+    //     cells.push(musicianCell);
+    //     cellMap[musician] = musicianCell;
+    //   }
 
-      connections.push(new Connection(bandCell, musicianCell));
-    });
+    //   connections.push(new Connection(bandCell, musicianCell));
+    // });
+  }
+}
+
+function randomLayout(bandNames) {
+  print("Random layout");
+
+  let numBands = bandNames.length;
+  for (let i = 0; i < numBands; i++) {
+    let bandName = bandNames[i];
+    let x = random(frameWidth);
+    let y = random(frameHeight);
+    let bandCell = new Cell(bandName, 'band', x, y);
+    cells.push(bandCell);
+    cellMap[bandName] = bandCell;
+
+  }
+}
+
+
+// Initialize cells and connections
+function initializeCells() {
+ // Maps names to Cell instances for easy lookup
+
+  let bandNames = Object.keys(bands);
+
+  // index only the first 5 bands
+  bandNames = bandNames.slice(0, 10);
+
+
+  if (layoutType === "grid") {
+    gridLayout(bandNames);
+
+  } else if (layoutType === "random") {
+    randomLayout(bandNames);
   }
 }
 
